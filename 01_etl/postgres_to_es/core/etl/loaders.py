@@ -5,7 +5,7 @@ from core.constants import SQL_TEMPLATES
 
 
 class PostgresLoader(PostgresConnector):
-    def _get_data(self, template, params, table_name=None):
+    def __get_data(self, template, params, table_name=None):
         if table_name:
             sql_tmp = SQL_TEMPLATES.get(template).format(table_name, table_name)
         else:
@@ -24,7 +24,7 @@ class PostgresLoader(PostgresConnector):
                 'limit': limit,
                 'offset': offset
             }
-            table_ids = self._get_data('table_id', params, table_name=table)
+            table_ids = self.__get_data('table_id', params, table_name=table)
             if not table_ids:
                 break
             yield table_ids
@@ -34,13 +34,13 @@ class PostgresLoader(PostgresConnector):
                 break
 
     def get_person_data(self, ids: List):
-        return self._get_data(
+        return self.__get_data(
             template='person_id',
             params={'persons_ids': tuple(ids)}
         )
 
     def get_genre_data(self, ids: List):
-        return self._get_data(
+        return self.__get_data(
             template='genre_id',
             params={'genres_ids': tuple(ids)}
         )
@@ -49,13 +49,13 @@ class PostgresLoader(PostgresConnector):
         if not film_ids:
             return None
 
-        return self._get_data(
+        return self.__get_data(
             template='films',
             params={'films_id': tuple(film_ids)}
         )
 
     def get_film_id_in_table(self, table: str, table_ids: List):
-        return self._get_data(
+        return self.__get_data(
             template='related_film_id',
             params={'ids': tuple(table_ids)},
             table_name=table

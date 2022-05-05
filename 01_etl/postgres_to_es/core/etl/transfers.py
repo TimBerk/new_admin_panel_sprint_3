@@ -1,3 +1,4 @@
+from abc import ABC
 from collections import defaultdict
 from typing import Dict
 
@@ -14,9 +15,9 @@ from core.models import (
 from core.settings import logging
 
 
-class PostgresTransform:
+class PostgresTransform(ABC):
     @staticmethod
-    def _get_base_data(record, mapper, result, parser):
+    def __get_base_data(record, mapper, result, parser):
         """Получение и парсинг записей."""
         try:
             item = mapper(**record)
@@ -29,7 +30,7 @@ class PostgresTransform:
         return item, data, result
 
     @staticmethod
-    def _get_mapping_persons(role, data):
+    def __get_mapping_persons(role, data):
         """Получение имен и персон."""
         current_attr = role + 's'
         if current_attr not in data.dict().keys():
@@ -44,13 +45,13 @@ class PostgresTransform:
             'persons': getattr(data, current_attr)
         }
 
-    def _add_role_person(self, role, data, film):
+    def __add_role_person(self, role, data, film):
         """Добавление роли персоны."""
         try:
             person = Person(**film)
         except Exception as e:
             logging.error(e)
-        data_mapping = self._get_mapping_persons(role, data)
+        data_mapping = self.__get_mapping_persons(role, data)
         if data_mapping:
             if person.name not in data_mapping['names']:
                 if role != PersonFilmRole.DIRECTOR:
@@ -62,7 +63,7 @@ class PostgresTransform:
     def transform_film(self, records) -> Dict:
         result = defaultdict(dict)
         for record in records:
-            film, data, result = self._get_base_data(record, Filmwork, result, FilmworkElastick)
+            film, data, result = self.__get_base_data(record, Filmwork, result, FilmworkElastick)
             if not film:
                 continue
 
@@ -71,7 +72,7 @@ class PostgresTransform:
                 data.genre.add(genre_name)
 
             if film.role:
-                self._add_role_person(film.role, data, record)
+                self.__add_role_person(film.role, data, record)
 
             result[film.id] = data
         return result
@@ -79,7 +80,7 @@ class PostgresTransform:
     def transform_persons(self, records) -> Dict:
         result = defaultdict(dict)
         for record in records:
-            person, data, result = self._get_base_data(record, PersonFilmWork, result, PersonElastic)
+            person, data, result = self.__get_base_data(record, PersonFilmWork, result, PersonElastic)
             if not person:
                 continue
 
@@ -91,7 +92,7 @@ class PostgresTransform:
     def transform_genres(self, records) -> Dict:
         result = defaultdict(dict)
         for record in records:
-            genre, data, result = self._get_base_data(record, GenreFilmwork, result, GenreElastic)
+            genre, data, result = self.__get_base_data(record, GenreFilmwork, result, GenreElastic)
             if not genre:
                 continue
 

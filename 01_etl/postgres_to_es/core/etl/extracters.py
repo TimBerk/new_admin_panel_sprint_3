@@ -1,4 +1,5 @@
 import json
+from abc import ABC
 from datetime import datetime
 
 from core.etl.loaders import PostgresLoader
@@ -6,7 +7,7 @@ from core.etl.transfers import PostgresTransform
 from core.settings import BLOCK_SIZE, DEFAULT_DATE, FORMAT_DATE
 
 
-class ElasticExtract:
+class ElasticExtract(ABC):
     RELATED_TABLES = ['person', 'genre']
 
     def __init__(self, state, pg, es, table_name):
@@ -16,22 +17,22 @@ class ElasticExtract:
         self.table_name: str = table_name
 
     @staticmethod
-    def _get_transformer_func(table_name):
+    def __get_transformer_func(table_name):
         if table_name == 'person':
             return PostgresTransform().transform_persons
         elif table_name == 'genre':
             return PostgresTransform().transform_genres
         return None
 
-    def _get_index_name(self, table_name):
+    def __get_index_name(self, table_name):
         if table_name in self.RELATED_TABLES:
             return table_name + 's'
         return None
 
-    def _is_related(self, table_name):
+    def __is_related(self, table_name):
         return table_name in self.RELATED_TABLES
 
-    def _get_data_func(self, table_name):
+    def __get_data_func(self, table_name):
         if table_name == 'person':
             return self.pg.get_person_data
         elif table_name == 'genre':
@@ -54,18 +55,18 @@ class ElasticExtract:
         for modified_ids in self.pg.chunk_read_table_id(self.table_name, date_start, limit, offset_start):
             date_end = datetime.now().strftime(FORMAT_DATE)
             offset_start += limit
-            is_related = self._is_related(self.table_name)
+            is_related = self.__is_related(self.table_name)
 
             if is_related:
                 film_modified_ids = self.pg.get_film_id_in_table(
                     self.table_name, [item['id'] for item in modified_ids]
                 )
-                data = self._get_data_func(self.table_name)(
+                data = self.__get_data_func(self.table_name)(
                     [item['id'] for item in modified_ids]
                 )
-                serialize_data_index = self._get_transformer_func(self.table_name)(data)
+                serialize_data_index = self.__get_transformer_func(self.table_name)(data)
                 self.es.set_bulk(
-                    self._get_index_name(self.table_name),
+                    self.__get_index_name(self.table_name),
                     serialize_data_index.values()
                 )
             else:

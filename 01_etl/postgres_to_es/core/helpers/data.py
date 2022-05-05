@@ -4,7 +4,7 @@ from typing import Any
 from core.helpers.storages import BaseStorage
 
 
-class DbLoader:
+class DbLoader(abc.ABC):
     """Класс для работы с базой данных."""
     def __init__(self, logger=None):
         self.connection = None
@@ -15,7 +15,7 @@ class DbLoader:
         pass
 
 
-class State:
+class State(abc.ABC):
     """
     Класс для хранения состояния при работе с данными, чтобы постоянно не перечитывать данные с начала.
     Здесь представлена реализация с сохранением состояния в файл.

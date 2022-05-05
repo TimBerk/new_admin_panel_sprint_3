@@ -15,7 +15,6 @@ class RedisStorage(DbLoader, BaseStorage):
     @backoff(logger=logging)
     def connect(self):
         self.connection = Redis(**REDIS_DSL)
-        print(REDIS_DSL)
 
     @backoff(logger=logging)
     def save_state(self, state: dict) -> None:
