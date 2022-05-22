@@ -24,8 +24,12 @@ class PersonFilmWork(Person):
     film_work_id: Optional[str]
 
 
-class PersonElastic(Person):
-    name: str
+class BasePersonElastic(BaseModel):
+    uuid: str = Field(alias='id')
+    full_name: str = Field(alias='name')
+
+
+class PersonElastic(BasePersonElastic):
     role: Set[str] = set()
     film_ids: Set[str] = set()
 
@@ -40,7 +44,9 @@ class GenreFilmwork(Genre):
     film_work_id: str
 
 
-class GenreElastic(Genre):
+class GenreElastic(BaseModel):
+    uuid: str = Field(alias='id')
+    name: str
     description: Optional[str]
     film_ids: Set[str] = set()
 
@@ -61,13 +67,15 @@ class Filmwork(BaseModel):
 
 
 class FilmworkElastick(BaseModel):
-    id: str
+    uuid: str = Field(alias='id')
     title: str
     description: Optional[str]
     imdb_rating: Optional[float] = Field(alias='rating', default=0)
+    created_at: datetime.datetime
     genre: Set = set()
-    director: List[Person] = []
-    actors: List[Person] = []
+    directors: List[BasePersonElastic] = []
+    directors_names: Set = set()
+    actors: List[BasePersonElastic] = []
     actors_names: Set = set()
-    writers: List[Person] = []
+    writers: List[BasePersonElastic] = []
     writers_names: Set = set()

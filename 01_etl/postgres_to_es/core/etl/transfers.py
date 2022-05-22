@@ -3,13 +3,13 @@ from collections import defaultdict
 from typing import Dict
 
 from core.models import (
+    BasePersonElastic,
     Filmwork,
     FilmworkElastick,
     GenreElastic,
     GenreFilmwork,
     Person,
     PersonElastic,
-    PersonFilmRole,
     PersonFilmWork,
 )
 from core.settings import logging
@@ -35,10 +35,6 @@ class PostgresTransform(ABC):
         current_attr = role + 's'
         if current_attr not in data.dict().keys():
             return None
-        if role == PersonFilmRole.DIRECTOR:
-            return {
-                'names': data.director
-            }
 
         return {
             'names': getattr(data, f'{current_attr}_names'),
@@ -54,11 +50,8 @@ class PostgresTransform(ABC):
         data_mapping = self.__get_mapping_persons(role, data)
         if data_mapping:
             if person.name not in data_mapping['names']:
-                if role != PersonFilmRole.DIRECTOR:
-                    data_mapping['names'].add(person.name)
-                    data_mapping['persons'].append(person)
-                else:
-                    data.director.append(person)
+                data_mapping['names'].add(person.name)
+                data_mapping['persons'].append(BasePersonElastic(**person.dict()))
 
     def transform_film(self, records) -> Dict:
         result = defaultdict(dict)

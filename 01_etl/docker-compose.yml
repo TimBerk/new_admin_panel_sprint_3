@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8081:8081"
     env_file:
       - ./.env
     volumes:
@@ -35,33 +35,6 @@ services:
     depends_on:
       - backend
 
-  redis:
-    image: redis:alpine
-    hostname: redis
-    env_file:
-      - ./.env
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_volume:/data
-
-  redisinsight:
-    image: redislabs/redisinsight:latest
-    ports:
-      - '8079:8001'
-    volumes:
-      - redis_insight_volume:/db
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    environment:
-      - xpack.security.enabled=false
-      - "discovery.type=single-node"
-    ports:
-      - "9200:9200"
-
 volumes:
   postgres_data: {}
   static_volume: {}
-  redis_volume: {}
-  redis_insight_volume: {}

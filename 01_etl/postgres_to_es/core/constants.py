@@ -85,8 +85,7 @@ MOVIES_SETTINGS = {
     'mappings': {
         'dynamic': 'strict',
         'properties': {
-
-            'id': {
+            'uuid': {
                 'type': 'keyword'
             },
             'imdb_rating': {
@@ -108,27 +107,34 @@ MOVIES_SETTINGS = {
                 'type': 'text',
                 'analyzer': 'ru_en'
             },
-            'director': {
+            'created_at': {
+                'type': 'date'
+            },
+            'directors': {
                 'type': 'nested',
                 'dynamic': 'strict',
                 'properties': {
-                    'id': {
+                    'uuid': {
                         'type': 'keyword'
                     },
-                    'name': {
+                    'full_name': {
                         'type': 'text',
                         'analyzer': 'ru_en'
                     }
                 }
             },
+            'directors_names': {
+                'type': 'text',
+                'analyzer': 'ru_en'
+            },
             'writers': {
                 'type': 'nested',
                 'dynamic': 'strict',
                 'properties': {
-                    'id': {
+                    'uuid': {
                         'type': 'keyword'
                     },
-                    'name': {
+                    'full_name': {
                         'type': 'text',
                         'analyzer': 'ru_en'
                     }
@@ -142,10 +148,10 @@ MOVIES_SETTINGS = {
                 'type': 'nested',
                 'dynamic': 'strict',
                 'properties': {
-                    'id': {
+                    'uuid': {
                         'type': 'keyword'
                     },
-                    'name': {
+                    'full_name': {
                         'type': 'text',
                         'analyzer': 'ru_en'
                     }
@@ -165,11 +171,16 @@ PERSONS_SETTINGS = {
     'mappings': {
         'dynamic': 'strict',
         'properties': {
-            'id': {
+            'uuid': {
                 'type': 'keyword'
             },
-            'name': {
+            'full_name': {
                 'type': 'text',
+                'fields': {
+                    'keyword': {
+                        'type': 'keyword'
+                    }
+                },
                 'analyzer': 'ru_en'
             },
             'role': {
@@ -188,11 +199,16 @@ GENRES_SETTINGS = {
     'mappings': {
         'dynamic': 'strict',
         'properties': {
-            'id': {
+            'uuid': {
                 'type': 'keyword'
             },
             'name': {
                 'type': 'text',
+                'fields': {
+                    'keyword': {
+                        'type': 'keyword'
+                    }
+                },
                 'analyzer': 'ru_en'
             },
             'description': {

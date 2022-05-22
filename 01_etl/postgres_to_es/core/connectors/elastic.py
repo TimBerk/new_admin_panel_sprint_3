@@ -36,6 +36,6 @@ class ESLoader(DbLoader):
         for item in data:
             yield {
                 '_index': index,
-                '_id': item.id,
+                '_id': item.uuid,
                 '_source': item.json()
             }
