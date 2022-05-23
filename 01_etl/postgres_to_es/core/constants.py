@@ -94,7 +94,7 @@ MOVIES_SETTINGS = {
             'title': {
                 'type': 'text',
                 'fields': {
-                    'raw': {
+                    'keyword': {
                         'type': 'keyword'
                     }
                 },
